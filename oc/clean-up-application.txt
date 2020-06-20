@@ -1,0 +1,34 @@
+oc login --token=<your_token> --server=https://api.us-east-2.starter.openshift-online.com:6443
+
+oc logout
+
+# Delete all objects related to the application
+oc delete all -l app=springbootstarter-w-config
+# Also delete the generated secrets
+oc delete secret springbootstarter-w-config-github-webhook-secret
+oc delete secret springbootstarter-w-config-generic-webhook-secret
+
+# Create ConfigMap for application.properties
+oc create configmap springbootstarter-w-config-application-properties --from-file=/opt/springbootstarter-w-config/config/application.properties
+#  Add label to the COnfigMap for easy delete later on
+oc label <object_type> <object_name_or_id> \ <label>
+
+# Create ConfigMap for logbacm.xml
+
+# Create Deployment Config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
