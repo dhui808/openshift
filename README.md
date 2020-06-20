@@ -1,2 +1,2 @@
 # OpenShift
-OpenSHift-related articles, examples and tutorials
+OpenShift-related articles, examples and tutorials
