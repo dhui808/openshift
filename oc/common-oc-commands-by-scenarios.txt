@@ -10,10 +10,11 @@ oc delete secret springbootstarter-w-config-generic-webhook-secret
 
 # Create ConfigMap for application.properties
 oc create configmap springbootstarter-w-config-application-properties --from-file=/opt/springbootstarter-w-config/config/application.properties
-#  Add label to the COnfigMap for easy delete later on
+#  Add label to the ConfigMap for easy delete later on
 oc label configmap springbootstarter-w-config-application-properties app=springbootstarter-w-config
 # Query ConfigMap by Label
 oc get configmap -l "app=springbootstarter-w-config"
+oc get cm -l "app=springbootstarter-w-config"
 
 # Create ConfigMap for logbacm.xml
 
