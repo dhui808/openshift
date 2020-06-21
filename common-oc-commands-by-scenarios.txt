@@ -24,7 +24,7 @@ oc get configmap -l app=springbootstarter-w-config
 oc get cm -l app=springbootstarter-w-config
 
 # Create ConfigMap for logback.xml
-oc create configmap springbootstarter-w-config-logback-xml --from-file=/opt/springbootstarter-w-config/config/logback.xml
+oc create configmap springbootstarter-w-config-logback-xml --from-file=/opt/springbootstarter-w-config/config/logback/logback.xml
 #  Add label to the ConfigMap for easy delete later on
 oc label configmap springbootstarter-w-config-logback-xml app=springbootstarter-w-config
 
