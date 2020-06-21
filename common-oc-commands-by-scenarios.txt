@@ -44,6 +44,7 @@ oc set volume dc/springbootstarter-w-config --add --overwrite --name volume-logb
 # Expose service
 oc expose svc/springbootstarter-w-config
 
+# Voila!
 
 
 
