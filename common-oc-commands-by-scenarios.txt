@@ -51,10 +51,11 @@ oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.co
 # service "springbootstarter-w-config" created
 
 # Add Volume and Volume Mount
-oc set volume dc/springbootstarter-w-config --add --name volume-config -t configmap --configmap-name springbootstarter-w-config-application-properties -m /opt/springbootstarter-w-config/config -o yaml
-oc set volume dc/springbootstarter-w-config --add --name volume-logback-config -t configmap --configmap-name springbootstarter-w-config-logback-xml  -m /opt/springbootstarter-w-config/config/logback -o yaml
+oc set volume dc/springbootstarter-w-config --add --name volume-config -t configmap --configmap-name springbootstarter-w-config-application-properties -m /opt/springbootstarter-w-config/config --read-only=true -o yaml
+oc set volume dc/springbootstarter-w-config --add --name volume-logback-config -t configmap --configmap-name springbootstarter-w-config-logback-xml  -m /opt/springbootstarter-w-config/config/logback --read-only=true -o yaml
 
 # Remove volume
+#oc set volume dc/springbootstarter-w-config --remove --name volume-config
 #oc set volume dc/springbootstarter-w-config --remove --name volume-logback-config
 
 # Expose service
