@@ -9,3 +9,17 @@ OpenShift-related articles, examples and tutorials
 
 3. Deploy Spring Boot application with external configuration to Openshift 
 [from oc CLI](https://github.com/dhui808/openshift/blob/master/from-oc-to-openshift.txt)
+
+4. Swagger (TBD)
+
+5. Database (TBD)
+
+6. ELK (TBD)
+
+7. SSL to external service (TBD)
+
+8. Jenkins (TBD)
+
+9. Ansible (TBD)
+
+10. Install OpenShift cluster on Azure (TBD)
