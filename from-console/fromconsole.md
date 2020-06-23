@@ -1,4 +1,4 @@
-##Deploy Spring Boot Web Application from OpenShift Web Console
+# Deploy Spring Boot Web Application from OpenShift Web Console
 
 Login to OpenShift 4.4
 

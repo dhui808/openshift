@@ -1,4 +1,4 @@
-##Deploy Spring Boot Web Application with external configuration files from OpenShift Web Console
+# Deploy Spring Boot Web Application with external configuration files from OpenShift Web Console
 
 Source:
 <https://github.com/dhui808/springbootstarter-w-config>
