@@ -1,9 +1,9 @@
 Install a template / Create a template in a project / upload a template
 
 creating application from template generates:
-  deployment configuration, service, pod
+  deployment configuration, replication controller, service, pod
   optional: config map, secret
   
 creating application from image-stream generates:
-  deployment, service, and build configuration, build, image stream, pod
+  deployment, replica set, build configuration, build, image stream, service, pod
   optional: config map, secret
