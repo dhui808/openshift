@@ -7,3 +7,9 @@ creating application from template generates:
 creating application from image-stream generates:
   deployment, replica set, build configuration, build, image stream, service, pod
   optional: config map, secret
+
+creating application from git - select Deployment
+  deployment, replica set, build configuration, build, image stream, service, pod, secret
+  optional: route
+
+creating application from git - select Deployment Config
