@@ -13,3 +13,5 @@ creating application from git - select Deployment
   optional: route
 
 creating application from git - select Deployment Config
+  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret
+  optional: route
