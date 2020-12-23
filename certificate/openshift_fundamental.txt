@@ -1,1 +1,4 @@
 Install a template / Create a template in a project / upload a template
+
+creating application from image-stream generates:
+  deployment configuration, service, and build configuration, build, image stream
