@@ -1,4 +1,4 @@
-Help is used to deploy applications (buildconfig, deploymentconfig, imagestream, service, route) or just resources (service, route) to OpenShift
+Help is used to deploy applications (buildconfig, deploymentconfig, imagestream, service, route) or just resources (service, route) to OpenShift from yaml files.
 
 sudo curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm
 sudo chmod +x /usr/local/bin/helm
