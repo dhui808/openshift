@@ -54,3 +54,16 @@ creating application from Helm
 
 Modifying uploaded templates
   oc edit template <template>
+
+Creating a template from existing objects
+  oc get -o yaml --export all > <yaml_filename>
+
+The object types included in oc get --export all are:
+	BuildConfig
+	Build
+  ImageStream
+	DeploymentConfig
+	ReplicationController
+	Pod
+	Route
+	Service
