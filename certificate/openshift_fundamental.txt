@@ -51,3 +51,6 @@ creating application from Template
   
 creating application from Helm
   elements similar to using Template. 
+
+Modifying uploaded templates
+  oc edit template <template>
