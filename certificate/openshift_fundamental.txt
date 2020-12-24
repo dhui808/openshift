@@ -57,6 +57,7 @@ Modifying uploaded templates
 
 Creating a template from existing objects
   oc get -o yaml --export all > <yaml_filename>
+(this command does not work as of oc 4.6.9)
 
 The object types included in oc get --export all are:
 	BuildConfig
