@@ -1,7 +1,26 @@
 Template
 
-Install a template / Create a template in a project / upload a template
+A template is a JSON or YAML file that defines a set of resources.
 
+The template file is uploaded to OpenShift template library.
+
+The template ca be used to create any objects:
+  Services
+  Pods
+  Routes
+  Build configurations
+  Deployment configurations
+
+Install a template / Create a template in a project / upload a template
+  oc create -f $HOME/openshift/template/mlbparks-template-eap.json
+
+Create an application from the template
+  oc new-app mlbparks-eap --param MONGODB_PASSWORD=passw0rd
+  
+Create a resource (configuration) from a template
+  oc process -f <template_file_name>
+  
+Objects generated from a template
 creating application from template generates:
   deployment configuration, replication controller, service, pod
   optional: config map, secret
