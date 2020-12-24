@@ -15,3 +15,9 @@ creating application from git - select Deployment
 creating application from git - select Deployment Config
   deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret
   optional: route
+
+creating application from Template
+  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret, route
+  
+creating application from Helm
+  elements similar to using Template.  
