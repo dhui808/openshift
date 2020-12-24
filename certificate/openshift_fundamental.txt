@@ -16,10 +16,16 @@ Install a template / Create a template in a project / upload a template
 
 Create an application from the template
   oc new-app mlbparks-eap --param MONGODB_PASSWORD=passw0rd
+
+Create an application from the template file
+  oc new-app --file=./example/myapp/template.json --param=MYSQL_USER=admin
   
-Create a resource (configuration) from a template
+Create a resource (configuration) from a template file
   oc process -f <template_file_name>
-  
+
+Create a resource (configuration) from a template
+   oc process <template_name>
+
 Objects generated from a template
 creating application from template generates:
   deployment configuration, replication controller, service, pod
