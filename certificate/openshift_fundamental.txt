@@ -20,12 +20,15 @@ Create an application from the template
 Create an application from the template file
   oc new-app --file=./example/myapp/template.json --param=MYSQL_USER=admin
   
-Create a resource (configuration) from a template file
+Generate configuration from a template file (just output JSON, no object is created)
   oc process -f <template_file_name>
 
-Create a resource (configuration) from a template
+Generate configuration from a template (just output JSON, no object is created)
    oc process <template_name>
 
+Generate configuration and create objects
+  oc process -f <filename> | oc create -f -
+  
 Objects generated from a template
 creating application from template generates:
   deployment configuration, replication controller, service, pod
