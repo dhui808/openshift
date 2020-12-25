@@ -8,7 +8,11 @@ Health Checks
     HTTP Get
     TCP Socket
     Container Command
-		
+    
+  Monitoring health check failures using the Developer perspective
+    Topology - Monitoring
+    	Events (Warning) section
+	
 Template
 
 A template is a JSON or YAML file that defines a set of resources.
