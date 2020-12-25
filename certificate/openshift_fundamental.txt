@@ -10,8 +10,7 @@ Health Checks
     Container Command
     
   Monitoring health check failures using the Developer perspective
-    Topology - Monitoring
-    	Events (Warning) section
+    Monitoring - Events
 	
 Template
 
