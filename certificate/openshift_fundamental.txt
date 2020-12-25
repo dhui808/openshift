@@ -1,3 +1,14 @@
+Health Checks
+  Health check types:
+    Readiness probes
+    Liveness probes
+    Startup probes
+    
+  Probe types:
+    HTTP probes
+    TCP probes
+    Command probes
+		
 Template
 
 A template is a JSON or YAML file that defines a set of resources.
