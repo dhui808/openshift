@@ -5,9 +5,9 @@ Health Checks
     Startup probes
     
   Probe types:
-    HTTP probes
-    TCP probes
-    Command probes
+    HTTP Get
+    TCP Socket
+    Container Command
 		
 Template
 
