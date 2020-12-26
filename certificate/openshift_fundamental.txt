@@ -7,7 +7,10 @@ Creating applications using the CLI
       oc new-app  java:openjdk-11-el7~https://github.com/dhui808/springbootstarter
       oc expose service/springbootstarter
     Build strategy detection
+    	if Jenkinsfile exists -> pipeline strategy, otherwise -> source strategy
     Language detection
+      pom.xml -> java
+      app.json, package.json -> nodejs
   Creating an application from an image
     Docker Hub MySQL image
     Image in a private registry
