@@ -12,6 +12,7 @@ Creating applications using the CLI
       pom.xml -> java
       app.json, package.json -> nodejs
       
+      Note: language detect is not working from oc. Have to specify language explicitly.
       You can override the image the builder uses for a particular source repository by specifying the image, e.g. java~ or java:openjdk-11-el7~.
   Creating an application from an image
     Docker Hub MySQL image
