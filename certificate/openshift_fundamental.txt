@@ -18,6 +18,7 @@ Creating applications using the CLI
     Docker Hub MySQL image
     Image in a private registry
     	oc new-app docker.io/dannyhui/servicevirtualizationservlet
+	(generating deployment, imagestream, pod. However, if doing the same from web console, service and replica sets are also generated, plus optional route. Inconsistent.)
     Existing image stream and optional image stream tag
   Creating an application from a template
     Template parameters
