@@ -17,6 +17,7 @@ Creating applications using the CLI
   Creating an application from an image
     Docker Hub MySQL image
     Image in a private registry
+    	oc new-app docker.io/dannyhui/servicevirtualizationservlet
     Existing image stream and optional image stream tag
   Creating an application from a template
     Template parameters
