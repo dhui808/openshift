@@ -203,7 +203,23 @@ Managing DeploymentConfig objects
 		  securityContext: {}
 		  serviceAccount: <service_account>
 		  serviceAccountName: <service_account>
-		  
+
+Deployment strategies for DeploymentConfig: A deployment strategy uses readiness checks to determine if a new pod is ready for use.
+		Rolling strategy: A rolling deployment replaces instances of the previous version of an application with instances of the new version one by one.
+			maxUnavailable  = 2, maxUnavailable = 10%
+		Canary deployments
+			All rolling deployments are canary deployments; a new version (the canary) is tested before all of the old instances are replaced. If the 
+			readiness check never succeeds, the canary instance is removed and the DeploymentConfig object will be automatically rolled back.
+		Creating a rolling deployment using the CLI: oc scale dc/deployment-example --replicas=3
+			Trigger a new deployment automatically by tagging a new version as the latest tag: oc tag deployment-example:v2 deployment-example:latest
+		Starting a rolling deployment using the Developer perspective
+	Recreate strategy: Scales down the previous deployment to zero before scaling up the new deployment
+		Starting a recreate deployment using the Developer perspective
+	Custom strategy: either use "Custom" strategy or add "customParams" field in "Rolling"/"Recreate" strategy
+	Lifecycle hooks: Every hook has a failure policy, which defines the action the strategy should take when a hook failure is encountered
+		Setting lifecycle hooks using the CLI
+		oc set deployment-hook dc/frontend --pre -c helloworld -e CUSTOM_VAR1=custom_value1 --volumes data --failure-policy=abort -- /usr/bin/command arg1 arg2
+		
 Health Checks
   Health check types:
     Readiness probes
