@@ -219,7 +219,43 @@ Deployment strategies for DeploymentConfig: A deployment strategy uses readiness
 	Lifecycle hooks: Every hook has a failure policy, which defines the action the strategy should take when a hook failure is encountered
 		Setting lifecycle hooks using the CLI
 		oc set deployment-hook dc/frontend --pre -c helloworld -e CUSTOM_VAR1=custom_value1 --volumes data --failure-policy=abort -- /usr/bin/command arg1 arg2
-		
+
+Using route-based deployment strategies for DeploymentConfig
+	Proxy shards and traffic splitting
+	N-1 compatibility: data written by the new code can be read and handled (or gracefully ignored) by the old version of the code.
+	Graceful termination
+	Blue-green deployments: The new version (blue) is brought up for testing and evaluation, while the users still use the stable version (green).
+		Setting up a blue-green deployment: Blue-green deployments use two DeploymentConfig objects.
+	A/B deployments: both old version and new version are active at the same time and some users use one version, and some users use the other version.
+		Load balancing for A/B testing
+			When you deploy the route, the router balances the traffic according to the weights specified for the services. 
+			Adding the other service as an alternateBackends and adjusting the weights brings the A/B setup to life. This can be done by the 
+			oc set route-backends command or by editing the route through web console or oc edit route <route_name>
+				...
+				metadata:
+				  name: route-alternate-service
+				  annotations:
+					haproxy.router.openshift.io/balance: roundrobin
+				spec:
+				  host: ab-example.my-project.my-domain
+				  to:
+					kind: Service
+					name: ab-example-a
+					weight: 10
+				  alternateBackends:
+				  - kind: Service
+					name: ab-example-b
+					weight: 15
+				...
+			or
+			oc set route-backends ab-example ab-example-a=198 ab-example-b=2
+			oc set route-backends ab-example --adjust ab-example-b=5%
+			
+			One service, multiple DeploymentConfig objects
+			
+	In all three deployment, canary, blue-green and A/B, both old version and new version are running at the same time.
+	A/B testing is for measuring functionality in the app. Blue-green deployments is about releasing new software safely and rolling back predictably
+	
 Health Checks
   Health check types:
     Readiness probes
