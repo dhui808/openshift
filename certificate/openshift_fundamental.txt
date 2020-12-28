@@ -146,7 +146,64 @@ Deployment and DeploymentConfig objects
 			Rollover
 			Proportional scaling
 			Pausing mid-rollout
-			
+
+Managing DeploymentConfig objects
+	Starting a deployment: oc rollout latest dc/<name>
+	Viewing a deployment: oc rollout history dc/<name>
+		oc describe dc <name>
+	Retrying a deployment: oc rollout retry dc/<name>
+	Rolling back a deployment: oc rollout undo dc/<name>
+		Image change triggers on the DeploymentConfig object are disabled as part of the rollback
+		To re-enable the image change triggers:  oc set triggers dc/<name> --auto
+	Executing commands inside a container: add a command to a container, which modifies the container’s start-up behavior by overruling the image’s ENTRYPOINT
+		spec:
+		  containers:
+			-
+			name: example-spring-boot
+			image: 'image'
+			command:
+			  - java
+			args:
+			  - '-jar'
+			  - /opt/app-root/springboots2idemo.jar
+	Viewing deployment logs: oc logs -f dc/<name>
+	Deployment triggers: 
+		Config change deployment trigger
+			triggers:
+			  - type: "ConfigChange"
+		Image change deployment trigger
+			triggers:
+			  - type: "ImageChange"
+				imageChangeParams:
+				  automatic: true 
+				  from:
+					kind: "ImageStreamTag"
+					name: "origin-ruby-sample:latest"
+					namespace: "myproject"
+				  containerNames:
+					- "helloworld"
+		Setting deployment triggers: oc set triggers dc/<dc_name> --from-image=<project>/<image>:<tag> -c <container_name>
+	Setting deployment resources
+		type: "Recreate"
+		resources:
+		  limits:
+			cpu: "100m" 
+			memory: "256Mi" 
+			ephemeral-storage: "1Gi" 
+	Scaling manually: oc scale dc frontend --replicas=3
+	Accessing private repositories from DeploymentConfig objects: set the Pull Secret
+	Assigning pods to specific nodes
+		use node selectors in conjunction with labeled nodes to control pod placement.
+		spec:
+		  nodeSelector:
+			disktype: ssd
+	Running a pod with a different service account
+		Add the serviceAccount and serviceAccountName parameters to the spec field:
+		spec:
+		  securityContext: {}
+		  serviceAccount: <service_account>
+		  serviceAccountName: <service_account>
+		  
 Health Checks
   Health check types:
     Readiness probes
