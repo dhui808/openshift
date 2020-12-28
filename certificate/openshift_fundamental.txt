@@ -33,6 +33,120 @@ Creating applications using the CLI
     Grouping images and source in a single pod
     Searching for images, templates, and other inputs
 
+Deployment and DeploymentConfig objects
+	Deployment - Replica sets - Pods
+	DeploymentConfig - Replication controllers - Pods
+
+	Replication controllers:  ensures that a specified number of replicas of a pod are running at all times.
+		The number of replicas desired, which can be adjusted at run time.
+		A Pod definition to use when creating a replicated pod.
+		A selector for identifying managed pods.  is a set of labels assigned to the pods.
+		apiVersion: v1
+		kind: ReplicationController
+		metadata:
+		  name: frontend-1
+		spec:
+		  replicas: 1  
+		  selector:    
+			name: frontend
+		  template:    
+			metadata:
+			  labels:  
+				name: frontend 
+			spec:
+			  containers:
+			  - image: openshift/hello-openshift
+				name: helloworld
+				ports:
+				- containerPort: 8080
+				  protocol: TCP
+			  restartPolicy: Always
+	  
+	Replica sets:  is a native Kubernetes API object that ensures a specified number of pod replicas are running at any given time.
+		apiVersion: apps/v1
+		kind: ReplicaSet
+		metadata:
+		  name: frontend-1
+		  labels:
+			tier: frontend
+		spec:
+		  replicas: 3
+		  selector: 
+			matchLabels: 
+			  tier: frontend
+			matchExpressions: 
+			  - {key: tier, operator: In, values: [frontend]}
+		  template:
+			metadata:
+			  labels:
+				tier: frontend
+			spec:
+			  containers:
+			  - image: openshift/hello-openshift
+				name: helloworld
+				ports:
+				- containerPort: 8080
+				  protocol: TCP
+			  restartPolicy: Always	
+	
+	DeploymentConfig objects
+		A DeploymentConfig object creates a new replication controller and lets it start up pods.
+		If the deployment changes, a new replication controller is created with the latest pod template, and a deployment process runs
+		apiVersion: v1
+		kind: DeploymentConfig
+		metadata:
+		  name: frontend
+		spec:
+		  replicas: 5
+		  selector:
+			name: frontend
+		  template: { ... }
+		  triggers:
+		  - type: ConfigChange 
+		  - imageChangeParams:
+			  automatic: true
+			  containerNames:
+			  - helloworld
+			  from:
+				kind: ImageStreamTag
+				name: hello-openshift:latest
+			type: ImageChange  
+		  strategy:
+			type: Rolling
+			
+	Deployment objects: Deployments create replica sets, which orchestrate pod lifecycles.
+		apiVersion: apps/v1
+		kind: Deployment
+		metadata:
+		  name: hello-openshift
+		spec:
+		  replicas: 1
+		  selector:
+			matchLabels:
+			  app: hello-openshift
+		  template:
+			metadata:
+			  labels:
+				app: hello-openshift
+			spec:
+			  containers:
+			  - name: hello-openshift
+				image: openshift/hello-openshift:latest
+				ports:
+				- containerPort: 80
+	
+	Comparing Deployment and DeploymentConfig objects
+		It is recommended to use Deployment objects.
+		DeploymentConfig objects prefer consistency, whereas Deployments objects take availability over consistency.
+		DeploymentConfig object-specific features
+			Automatic rollbacks
+			Triggers
+			Lifecycle hooks
+		Deployment-specific features
+			Rollover
+			Proportional scaling
+			Pausing mid-rollout
+			
 Health Checks
   Health check types:
     Readiness probes
