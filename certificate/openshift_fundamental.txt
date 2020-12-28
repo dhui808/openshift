@@ -255,6 +255,21 @@ Using route-based deployment strategies for DeploymentConfig
 			
 	In all three deployment, canary, blue-green and A/B, both old version and new version are running at the same time.
 	A/B testing is for measuring functionality in the app. Blue-green deployments is about releasing new software safely and rolling back predictably
+
+Resource quotas per project
+	Resources managed by quotas
+		Compute resources managed by quota
+		Storage resources managed by quota
+		Object counts managed by quota
+	Quota scopes
+	Quota enforcement
+	Requests versus limits
+	Sample resource quota definitions
+	Creating a quota: oc create -f core-object-counts.yaml -n demoproject
+		Creating object count quotas: oc create quota test --hard=count/deployments.extensions=2,count/replicasets.extensions=4,count/pods=3,count/secrets=4
+		Setting resource quota for extended resources
+	Viewing a quota
+	Configuring explicit resource quotas using oc
 	
 Health Checks
   Health check types:
