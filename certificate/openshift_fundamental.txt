@@ -394,103 +394,103 @@ Health Checks
 	
 Template
 
-A template is a JSON or YAML file that defines a set of resources.
+	A template is a JSON or YAML file that defines a set of resources.
 
-The template file is uploaded to OpenShift template library.
+	The template file is uploaded to OpenShift template library.
 
-The template ca be used to create any objects:
-  Services
-  Pods
-  Routes
-  Build configurations
-  Deployment configurations
+	The template ca be used to create any objects:
+	  Services
+	  Pods
+	  Routes
+	  Build configurations
+	  Deployment configurations
 
-Install a template / Create a template in a project / upload a template
-  oc create -f $HOME/openshift/template/mlbparks-template-eap.json
+	Install a template / Create a template in a project / upload a template
+	  oc create -f $HOME/openshift/template/mlbparks-template-eap.json
 
-Create an application from the template
-  oc new-app mlbparks-eap --param MONGODB_PASSWORD=passw0rd
+	Create an application from the template
+	  oc new-app mlbparks-eap --param MONGODB_PASSWORD=passw0rd
 
-Create an application from the template file
-  oc new-app --file=./example/myapp/template.json --param=MYSQL_USER=admin
-  
-Generate configuration from a template file (just output JSON, no object is created)
-  oc process -f <template_file_name>
+	Create an application from the template file
+	  oc new-app --file=./example/myapp/template.json --param=MYSQL_USER=admin
 
-Generate configuration from a template (just output JSON, no object is created)
-   oc process <template_name>
+	Generate configuration from a template file (just output JSON, no object is created)
+	  oc process -f <template_file_name>
 
-Generate configuration and create objects
-  oc process -f <filename> | oc create -f -
-  
-Objects generated from a template
-creating application from template generates:
-  deployment configuration, replication controller, service, pod
-  optional: config map, secret
-  
-creating application from image-stream generates:
-  deployment, replica set, build configuration, build, image stream, service, pod
-  optional: config map, secret
+	Generate configuration from a template (just output JSON, no object is created)
+	   oc process <template_name>
 
-creating application from git - select Deployment
-  deployment, replica set, build configuration, build, image stream, service, pod, secret
-  optional: route
+	Generate configuration and create objects
+	  oc process -f <filename> | oc create -f -
 
-creating application from git - select Deployment Config
-  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret
-  optional: route
+	Objects generated from a template
+	creating application from template generates:
+	  deployment configuration, replication controller, service, pod
+	  optional: config map, secret
 
-creating application from Template
-  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret, route
-  
-creating application from Helm
-  elements similar to using Template. 
+	creating application from image-stream generates:
+	  deployment, replica set, build configuration, build, image stream, service, pod
+	  optional: config map, secret
 
-Modifying uploaded templates
-  oc edit template <template>
+	creating application from git - select Deployment
+	  deployment, replica set, build configuration, build, image stream, service, pod, secret
+	  optional: route
 
-Creating a template from existing objects
-  oc get -o yaml --export all > <yaml_filename>
-(this command does not work as of oc 4.6.9)
+	creating application from git - select Deployment Config
+	  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret
+	  optional: route
 
-The object types included in oc get --export all are:
-	BuildConfig
-	Build
-  ImageStream
-	DeploymentConfig
-	ReplicationController
-	Pod
-	Route
-	Service
+	creating application from Template
+	  deployment configuration, replica controller, build configuration, build, image stream, service, pod, secret, route
+
+	creating application from Helm
+	  elements similar to using Template. 
+
+	Modifying uploaded templates
+	  oc edit template <template>
+
+	Creating a template from existing objects
+	  oc get -o yaml --export all > <yaml_filename>
+	(this command does not work as of oc 4.6.9)
+
+	The object types included in oc get --export all are:
+		BuildConfig
+		Build
+	  ImageStream
+		DeploymentConfig
+		ReplicationController
+		Pod
+		Route
+		Service
 
 Helm
 
-Helm is used to deploy applications (buildconfig, deploymentconfig, imagestream, service, route) or just resources (service, route) to OpenShift from yaml files.
+	Helm is used to deploy applications (buildconfig, deploymentconfig, imagestream, service, route) or just resources (service, route) to OpenShift from yaml files.
 
-sudo curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm
-sudo chmod +x /usr/local/bin/helm
-helm version
+	sudo curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm
+	sudo chmod +x /usr/local/bin/helm
+	helm version
 
-Sample Helm template:
-  git clone https://github.com/redhat-gpte-devopsautomation/mlbparks-chart.git
+	Sample Helm template:
+	  git clone https://github.com/redhat-gpte-devopsautomation/mlbparks-chart.git
 
-Install Helm chart = create application from the Helm Chart! This is different from Template!
+	Install Helm chart = create application from the Helm Chart! This is different from Template!
 
-To install Helm Chart on OpenShift:
-  helm install mlbparks mlbparks-chart
-where 
-  mlbparks: the intended Helm template name. 
-  mlbparks-chart: Helm folder containg the following structure:
+	To install Helm Chart on OpenShift:
+	  helm install mlbparks mlbparks-chart
+	where 
+	  mlbparks: the intended Helm template name. 
+	  mlbparks-chart: Helm folder containg the following structure:
 
-  mlbparks-chart/
-    Chart.yaml
-    values.yaml
-    templates/
-	    buildconfig.yaml
-      deploymentconfig.yaml
-      imagestream.yaml
-      route.yaml
-      service.yaml
+	  mlbparks-chart/
+	    Chart.yaml
+	    values.yaml
+	    templates/
+		    buildconfig.yaml
+	      deploymentconfig.yaml
+	      imagestream.yaml
+	      route.yaml
+	      service.yaml
 
 ========================================================================================================================================
 Understanding OpenShift Pipelines - Preview feature, using Tekton 
