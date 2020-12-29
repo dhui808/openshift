@@ -7,6 +7,32 @@ Builds
 BuildConfig: describes a single build definition and a set of triggers for when a new build is created.
 	typically generated automatically via the web console or CL
 
+Creating build inputs
+	Build inputs
+	Dockerfile source
+	Image source
+	Git source
+		Using a proxy
+		Source Clone Secrets
+	Binary (local) source
+	Input secrets and config maps
+		Adding input secrets and config maps
+		Source-to-image strategy
+		Docker strategy
+		Custom strategy
+	External artifacts
+	Using docker credentials for private registries
+	Build environments
+		Using build fields as environment variables
+		Using secrets as environment variables
+	What is a secret?
+		Properties of secrets
+		Types of Secrets
+		Updates to secrets
+		Creating secrets
+	Service serving certificate secrets
+	Secrets restrictions
+	
 Using build strategies
 	Docker build
 		Replacing Dockerfile FROM image
