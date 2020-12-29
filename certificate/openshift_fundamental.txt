@@ -3,7 +3,10 @@ Builds
 	Source-to-image build: from git source or binary
 	Custom build
 	Pipeline build: deprecated. Using Jenkinsfile
-
+	
+BuildConfig: describes a single build definition and a set of triggers for when a new build is created.
+	typically generated automatically via the web console or CL
+	
 Starting a build: oc start-build <buildconfig_name>
 	Re-running a build: oc start-build --from-build=<build_name>
 	Streaming build logs: oc start-build <buildconfig_name> --follow
