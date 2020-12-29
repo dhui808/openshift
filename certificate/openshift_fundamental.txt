@@ -491,3 +491,17 @@ where
       imagestream.yaml
       route.yaml
       service.yaml
+
+========================================================================================================================================
+Understanding OpenShift Pipelines - Preview feature, using Tekton 
+	Key features
+	Red Hat OpenShift Pipelines concepts
+	Detailed OpenShift Pipeline Concepts
+		Tasks
+		TaskRun
+		Pipelines
+		PipelineRun
+		Workspaces
+		Triggers
+	Additional resources
+========================================================================================================================================
