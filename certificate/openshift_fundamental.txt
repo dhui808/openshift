@@ -6,6 +6,36 @@ Builds
 	
 BuildConfig: describes a single build definition and a set of triggers for when a new build is created.
 	typically generated automatically via the web console or CL
+
+Using build strategies
+	Docker build
+		Replacing Dockerfile FROM image
+		Using Dockerfile path
+		Using docker environment variables
+		Adding docker build arguments
+	Source-to-image build
+		Performing source-to-image incremental builds
+		Overriding source-to-image builder image scripts
+		Source-to-image environment variables: specifying them in a .s2i/environment file in the source repository.
+		Ignoring source-to-image source files: using .s2iignore file
+		Creating images from source code with source-to-image: the build process and S2I scripts
+			build process consists of the following three fundamental elements:
+			Sources
+			Source-to-image (S2I) scripts
+			Builder image
+	Custom build
+		Using FROM image for custom builds
+		Using secrets in custom builds
+		Using environment variables for custom builds
+		Using custom builder images
+	Pipeline build
+		Understanding OpenShift Container Platform pipelines
+			Jenkins Client Plugin is installed and enabled by default when using the OpenShift Container Platform Jenkins image.
+		Providing the Jenkins file for pipeline builds
+		Using environment variables for pipeline builds
+		Pipeline build tutorial
+	Adding secrets with web console
+	Enabling pulling and pushing
 	
 Starting a build: oc start-build <buildconfig_name>
 	Re-running a build: oc start-build --from-build=<build_name>
