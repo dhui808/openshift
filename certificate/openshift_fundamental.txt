@@ -1,3 +1,9 @@
+Builds
+	Docker build: Using Dockerfile and base image
+	Source-to-image build: from git source or binary
+	Custom build
+	Pipeline build: deprecated. Using Jenkinsfile
+
 Creating applications using the CLI  
   Creating an application from source code
     Local
