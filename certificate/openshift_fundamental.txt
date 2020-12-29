@@ -4,6 +4,22 @@ Builds
 	Custom build
 	Pipeline build: deprecated. Using Jenkinsfile
 
+Starting a build: oc start-build <buildconfig_name>
+	Re-running a build: oc start-build --from-build=<build_name>
+	Streaming build logs: oc start-build <buildconfig_name> --follow
+	Setting environment variables when starting a build
+	Starting a build with source
+Canceling a build: oc cancel-build <build_name>
+	Canceling multiple builds: oc cancel-build <build1_name> <build2_name> <build3_name>
+	Canceling all builds: oc cancel-build bc/<buildconfig_name>
+	Canceling all builds in a given state
+Deleting a BuildConfig
+Viewing build details: oc describe build <build_name>
+Accessing build logs
+	Accessing BuildConfig logs: oc logs -f bc/<buildconfig_name>
+	Accessing BuildConfig logs for a given version build
+	Enabling log verbosity
+	
 Build triggers
 	Webhook triggers: oc set triggers bc <name> --from-github
 	Image change triggers: oc set triggers bc <name> --from-image='<image>'
