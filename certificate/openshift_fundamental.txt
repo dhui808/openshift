@@ -512,4 +512,6 @@ Imagestreams: different versions of the same basic image. Imagestreams do not co
 Image repository: a collection of related container images and tags identifying them
 Imagestreamtags: An imagestreamtag is a named pointer to an image in an imagestream. An image stream tag
 	is similar to a container image tag.
+
+/etc/containers/registries.conf
 ========================================================================================================================================
