@@ -88,33 +88,50 @@ Horizontal Pod Autoscalers for Automatically scaling pods
 		 To use this feature, you must configure readiness checks to determine if a new pod is ready for use.
 	Creating a horizontal pod autoscaler for CPU utilization
 		Use the oc describe PodMetrics <pod-name> command to determine if metrics are configured.
-		To create a HPA for CPU utilization: oc autoscale dc/<dc-name> --min <number> --max <number> --cpu-percent=<percent>
-										  or oc autoscale rc/<rc-name> --min <number> --max <number> --cpu-percent=<percent>
-										  or create HPA object using oc: oc create hpa frontend
-										  or create HPA object with YAML:
-											apiVersion: autoscaling/v2beta2 
-											kind: HorizontalPodAutoscaler
-											metadata:
-											  name: cpu-autoscale 
-											  namespace: default
-											spec:
-											  scaleTargetRef:
-												apiVersion: v1 
-												kind: ReplicationController 
-												name: example 
-											  minReplicas: 1 
-											  maxReplicas: 10 
-											  metrics: 
-											  - type: Resource
-												resource:
-												  name: cpu 
-												  target:
-													type: Utilization 
-													averageValue: 500m 
+		To create a HPA for CPU utilization: 
+		  oc autoscale dc/<dc-name> --min <number> --max <number> --cpu-percent=<percent>
+		  or oc autoscale rc/<rc-name> --min <number> --max <number> --cpu-percent=<percent>
+		  or create HPA object using oc: oc create hpa frontend
+		  or create HPA object with YAML:
+			apiVersion: autoscaling/v2beta2 
+			kind: HorizontalPodAutoscaler
+			metadata:
+			  name: cpu-autoscale 
+			  namespace: default
+			spec:
+			  scaleTargetRef:
+				apiVersion: v1 
+				kind: ReplicationController 
+				name: example 
+			  minReplicas: 1 
+			  maxReplicas: 10 
+			  metrics: 
+			  - type: Resource
+				resource:
+				  name: cpu 
+				  target:
+					type: Utilization 
+					averageValue: 500m 
 		To verify that the horizontal pod autoscaler was created: oc get hpa cpu-autoscale								  
 	Creating a horizontal pod autoscaler object for memory utilization: create HPA object with YAML
 	HPA status conditions: AbleToScale, ScalingActive, ScalingLimited
 	Viewing horizontal pod autoscaler status conditions: oc describe hpa <pod-name>
+Vertical Pod Autoscaler (VPA) for Automatically adjusting pod resource levels
+	About the Vertical Pod Autoscaler Operator
+	Installing the Vertical Pod Autoscaler Operator
+	About Using the Vertical Pod Autoscaler Operator
+	Using the Vertical Pod Autoscaler Operator
+Providing sensitive data to pods
+	Understanding secrets
+	Types of secrets
+	Example secret configurations
+	Secret data keys
+	Understanding how to create secrets
+	Secret creation restrictions
+	Creating an opaque secret
+	Understanding how to update secrets
+	About using signed certificates with secrets (the purpose?)
+	Generating signed certificates for use with secrets
 =======================================================================================================================================
 Builds
 	Docker build: Using Dockerfile and base image
