@@ -132,6 +132,22 @@ Providing sensitive data to pods
 	Understanding how to update secrets
 	About using signed certificates with secrets (the purpose?)
 	Generating signed certificates for use with secrets
+Placing pods on specific nodes using node selectors
+	A node selector specifies a map of key-value pairs. The rules are defined using custom labels
+	on nodes and selectors specified in pods.
+
+	For the pod to be eligible to run on a node, the pod must have the indicated key-value pairs
+	as the label on the node.
+
+	Using node selector labels on pods to control pod placement
+		To add node selectors to an existing pod, add a node selector to the controlling object 
+		for that pod, such as a ReplicaSet object, DaemonSet object, StatefulSet object, Deployment 
+		object, or DeploymentConfig object. Any existing pods under that controlling object are 
+		recreated on a node with a matching label. If you are creating a new pod, you can add the 
+		node selector directly to the Pod spec.
+		
+		Adding the label to the machine set ensures that new nodes or machines will have the label.
+		If adding labels to a node or machine config, the labels will not persist if the node or machine goes down
 =======================================================================================================================================
 Builds
 	Docker build: Using Dockerfile and base image
