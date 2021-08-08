@@ -1,0 +1,7 @@
+oc get pod -l deploymentconfig=quotesdb -o name
+oc rsh quotesdb-1-fk2vx
+vi /tmp/quotes.sql
+(copy & paste from local quotes.sql)
+mysql -uquoteapp -pmypa55word quotesdb < /tmp/quotes.sql
+exit
+curl http://quotesapi-dannyhui-dev.apps.sandbox.x8i5.p1.openshiftapps.com/get.php

@@ -1,0 +1,83 @@
+oc login --token=<your_token> --server=https://api.us-east-2.starter.openshift-online.com:6443
+
+oc logout
+
+# Get OpenJDK11 image, using Redhat account
+docker login registry.redhat.io
+docker pull registry.access.redhat.com/openjdk/openjdk-11-rhel7
+
+# Delete all objects related to the application
+oc delete all -l app=springbootstarter-w-config
+## oc output
+#pod "springbootstarter-w-config-2-gxtc7" deleted
+#replicationcontroller "springbootstarter-w-config-1" deleted
+#replicationcontroller "springbootstarter-w-config-2" deleted
+#service "springbootstarter-w-config" deleted
+#deploymentconfig.apps.openshift.io "springbootstarter-w-config" deleted
+#buildconfig.build.openshift.io "springbootstarter-w-config" deleted
+#build.build.openshift.io "springbootstarter-w-config-1" deleted
+#imagestream.image.openshift.io "openjdk-11-rhel7" deleted
+#imagestream.image.openshift.io "springbootstarter-w-config" deleted
+#route.route.openshift.io "springbootstarter-w-config" deleted
+
+## Secrets and ConfigMap are not deleted
+# Also delete the generated secrets
+oc delete secret springbootstarter-w-config-github-webhook-secret
+oc delete secret springbootstarter-w-config-generic-webhook-secret
+
+# Delete a ConfigMap
+oc delete cm springbootstarter-w-config-application-properties
+
+# Create ConfigMap for application.properties
+oc create configmap springbootstarter-w-config-application-properties --from-file=/opt/springbootstarter-w-config/config/application.properties
+#  Add label to the ConfigMap for easy delete later on
+oc label configmap springbootstarter-w-config-application-properties app=springbootstarter-w-config
+# Query ConfigMap by Label
+oc get configmap -l app=springbootstarter-w-config
+oc get cm -l app=springbootstarter-w-config
+
+# Create ConfigMap for logback.xml
+oc create configmap springbootstarter-w-config-logback-xml --from-file=/opt/springbootstarter-w-config/config/logback/logback.xml
+#  Add label to the ConfigMap for easy delete later on
+oc label configmap springbootstarter-w-config-logback-xml app=springbootstarter-w-config
+
+# Create an Application Using a Remote Git Repository with a label and a environment variable
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/springbootstarter-w-config -l app=springbootstarter-w-config -e JAVA_OPTIONS=-Dspring.config.location=file:///opt/springbootstarter-w-config/config/application.properties
+## oc output
+# Creating resources with label app=springbootstarter-w-config ...
+# imagestream.image.openshift.io "springbootstarter-w-config" created
+# buildconfig.build.openshift.io "springbootstarter-w-config" created
+# deploymentconfig.apps.openshift.io "springbootstarter-w-config" created
+# service "springbootstarter-w-config" created
+
+# Add Volume and Volume Mount
+oc set volume dc/springbootstarter-w-config --add --name volume-config -t configmap --configmap-name springbootstarter-w-config-application-properties -m /opt/springbootstarter-w-config/config --read-only=true -o yaml
+oc set volume dc/springbootstarter-w-config --add --name volume-logback-config -t configmap --configmap-name springbootstarter-w-config-logback-xml  -m /opt/springbootstarter-w-config/config/logback --read-only=true -o yaml
+
+# Remove volume
+#oc set volume dc/springbootstarter-w-config --remove --name volume-config
+#oc set volume dc/springbootstarter-w-config --remove --name volume-logback-config
+
+# Expose service
+oc expose svc/springbootstarter-w-config
+
+# Edit service to use name:8082-tcp, port: 8082 targetPort: 8082
+oc edit svc/springbootstarter-w-config
+
+# Edit route to use targetPort:8082-tcp
+oc edit route/springbootstarter-w-config
+
+## Note: deploymentConfig, replicationController and pod are showing the old containerPort 8080
+
+# Voila!
+
+
+
+
+
+
+
+
+
+
+

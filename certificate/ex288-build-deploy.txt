@@ -1,0 +1,43 @@
+oc new-app https://github.com/dhui808/springbootstarter
+    * A pipeline build using source code from https://github.com/dhui808/springbootstarter will be created
+    * Use 'oc start-build' to trigger a new build
+oc start-build springbootstarter
+
+Why Pipeline is the default strategy???
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/userreg  --strategy=source
+This is failing with RS error
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/userreg  --strategy=source --as-deployment-config
+oc expose svc/userreg
+Need to set up database!
+
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/springbootstarter  --strategy=source --as-deployment-config
+oc expose svc/springbootstarter
+curl http://springbootstarter-dannyhui-dev.apps.sandbox.x8i5.p1.openshiftapps.com/springbootstarter/hello
+Greetings from Spring Boot!
+
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/springbootstarter  --strategy=source
+oc expose svc/springbootstarter
+curl http://springbootstarter-dannyhui-dev.apps.sandbox.x8i5.p1.openshiftapps.com/springbootstarter/hello
+Greetings from Spring Boot!
+
+oc start-build springbootstarter
+oc logs bc/springbootstarter
+oc status
+oc get pod
+oc get route
+oc logs springbootstarter-5754f66656-gpmvh | head -n 3
+#head is unix cmd
+oc describe is springbootstarter
+oc delete all -l app=springbootstarter
+
+oc new-app registry.access.redhat.com/openjdk/openjdk-11-rhel7~https://github.com/dhui808/springbootstarter-w-config  --strategy=source -e JAVA_OPTIONS=-Dspring.config.location=file:///deployments/config/application.properties 
+
+oc create configmap springbootstarter-w-config-application-properties --from-file=/opt/springbootstarter-w-config/config/application.properties
+oc create configmap springbootstarter-w-config-logback-xml --from-file=/opt/springbootstarter-w-config/config/logback/logback.xml
+oc set volume deployment/springbootstarter-w-config --add --name volume-config -t configmap --configmap-name springbootstarter-w-config-application-properties -m /deployments/config -o yaml
+oc set volume deployment/springbootstarter-w-config --add --name volume-logback-config -t configmap --configmap-name springbootstarter-w-config-logback-xml  -m /opt/springbootstarter-w-config/config/logback --read-only=true -o yaml
+
+oc expose service/springbootstarter-w-config --port=8082
+
+http://springbootstarter-w-config-dannyhui-dev.apps.sandbox.x8i5.p1.openshiftapps.com/springbootstarter/hello
+

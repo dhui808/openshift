@@ -1,0 +1,3 @@
+#!/bin/bash -e
+echo "---- Before starting nginx"
+exec nginx -g "daemon off;"

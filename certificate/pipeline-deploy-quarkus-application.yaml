@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: deploy-quarkus-application
+spec:
+  params:
+  - name: APP_NAME
+    type: string
+    description: The application deployment name
+    default: coffee-shop
+  - name: IMAGE
+    type: string
+    description: The full name of the image to be set
+  - name: NAMESPACE
+    type: string
+    description: The project to set the image in
+    default: 79ltp-dev-coffeeshop
+  - name: DEPLOY_SERVERLESS
+    type: string
+    description: Whether or not deploy serverless service
+    default: 'false'
+    
+  tasks:
+  - name: update-serverless-service
+    when:
+    - Input: $(params.DEPLOY_SERVERLESS)
+      Operator: in
+      Values: 
+      - 'true'
+    taskRef:
+      kind: ClusterTask
+      name: kn
+    params:
+    - name: ARGS
+      value:
+      - service
+      - update
+      - $(params.APP_NAME)
+      - --image
+      - $(params.IMAGE)
+      - -n $(params.NAMESPACE)
+  - name: set-image-in-dev
+    when:
+    - Input: $(params.DEPLOY_SERVERLESS)
+      Operator: in
+      Values: 
+      - 'false'
+    taskRef:
+      kind: ClusterTask
+      name: openshift-client
+    params:
+    - name: ARGS
+      value:
+      - set
+      - image
+      - deployment
+      - $(params.APP_NAME)
+      - $(params.APP_NAME)=$(params.IMAGE)
+      - -n $(params.NAMESPACE)

@@ -1,0 +1,9 @@
+download oc client
+https://mirror.openshift.com/pub/openshift-v4/clients/
+
+logs when Pod starts:
+INFO exec  java -Dspring.config.location=file:///deployments/config/application.properties -javaagent:/opt/jboss/container/jolokia/jolokia.jar=config=/opt/jboss/container/jolokia/etc/jolokia.properties -Xms64m -Xmx256m -XX:+UseParallelOldGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:MaxMetaspaceSize=100m -XX:ParallelGCThreads=1 -Djava.util.concurrent.ForkJoinPool.common.parallelism=1 -XX:CICompilerCount=2 -XX:+ExitOnOutOfMemoryError -cp "." -jar /deployments/springbootstarter-w-config-0.0.1.jar  
+
+Rolling Deployment Strategy:
+The old pod and the new pod run at the same time for certain period. Each is allocated with the specified max. memroy. Plus OpenShift itself needs 256 Mi for deployment.
+So the memory quota should be > 2 * pod memory.limit + 256 Mi

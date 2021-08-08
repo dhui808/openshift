@@ -1,0 +1,31 @@
+Helm is used to deploy applications (buildconfig, deploymentconfig, imagestream, service, route) or just resources (service, route) to OpenShift from yaml files.
+
+sudo curl -L https://mirror.openshift.com/pub/openshift-v4/clients/helm/latest/helm-linux-amd64 -o /usr/local/bin/helm
+sudo chmod +x /usr/local/bin/helm
+helm version
+
+Sample Helm template:
+  git clone https://github.com/redhat-gpte-devopsautomation/mlbparks-chart.git
+  
+To install Helm Chart on OpenShift:
+  helm install mlbparks mlbparks-chart
+where 
+  mlbparks: the intended Helm template name. 
+  mlbparks-chart: Helm folder containg the following structure:
+
+  mlbparks-chart/
+    Chart.yaml
+    values.yaml
+    templates/
+	    buildconfig.yaml
+      deploymentconfig.yaml
+      imagestream.yaml
+      route.yaml
+      service.yaml
+
+Other Helm commands
+helm ls
+helm upgrade <template_name> .
+helm rollback <template_name> 1
+helm show values . > config.yml
+helm install -f config.yml <template_name_to_be> .

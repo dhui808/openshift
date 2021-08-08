@@ -1,0 +1,208 @@
+Build and deploy the Barista application using S2I
+
+Create OpenShift projects
+
+oc new-project ${OCP_USER}-prod-coffeeshop --display-name="Coffee Shop for ${OCP_USER} (Production)"
+oc new-project ${OCP_USER}-dev-coffeeshop --display-name="Coffee Shop for ${OCP_USER} (Development)"
+
+# Create the PostgreSQL database
+oc new-app postgresql-persistent \
+   --param DATABASE_SERVICE_NAME=coffee-shop-database \
+   --param POSTGRESQL_USER=coffee \
+   --param POSTGRESQL_PASSWORD=coffee \
+   --param POSTGRESQL_DATABASE=coffeeshop \
+   -n ${OCP_USER}-dev-coffeeshop
+
+# Label Database for Developer Console
+oc label dc coffee-shop-database \
+   app.kubernetes.io/part-of=coffee-shop \
+   app.openshift.io/runtime=postgresql \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+Build and deploy the Barista application using S2I
+oc create secret generic gitea-secret \
+   --from-literal=username=${GITEA_USER} \
+   --from-literal=password=${GITEA_PASSWORD} \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+oc new-app --name=barista \
+   openshift/ubi8-openjdk-11:1.3~${GITEA_URL}/${OCP_USER}/coffee-shop-source.git \
+   --context-dir=barista \
+   --source-secret=gitea-secret \
+   --build-env=MAVEN_MIRROR_URL=http://nexus.nexus.svc:8081/repository/maven-all-public/ \
+   --labels=app.kubernetes.io/part-of=coffee-shop,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+Build and deploy the Coffee Shop application using S2I
+
+oc new-app --name=coffee-shop \
+   openshift/ubi8-openjdk-11:1.3~${GITEA_URL}/${OCP_USER}/coffee-shop-source.git \
+   --context-dir=coffee-shop \
+   --source-secret=gitea-secret \
+   --build-env=MAVEN_MIRROR_URL=http://nexus.nexus.svc:8081/repository/maven-all-public/ \
+   --labels=app.kubernetes.io/part-of=coffee-shop,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+Create a secret named coffee-shop containing the connection parameters to the database.
+
+oc create secret generic coffee-shop \
+   --from-literal=quarkus.datasource.db-kind=postgresql \
+   --from-literal=quarkus.datasource.jdbc.url=jdbc:postgresql://coffee-shop-database:5432/coffeeshop \
+   --from-literal=quarkus.datasource.username=coffee \
+   --from-literal=quarkus.datasource.password=coffee \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+oc create configmap coffee-shop --from-literal=BARISTA_URL=http://barista:8080/processes -n ${OCP_USER}-dev-coffeeshop
+
+oc set env deploy coffee-shop --from=secret/coffee-shop -n ${OCP_USER}-dev-coffeeshop
+#this sets 4 envirables: QUARKUS_DATASOURCE_DB_KIND, QUARKUS_DATASOURCE_JDBC_URL, QUARKUS_DATASOURCE_PASSWORD, QUARKUS_DATASOURCE_USERNAME
+
+oc set env deploy coffee-shop --from=configmap/coffee-shop -n ${OCP_USER}-dev-coffeeshop
+#This creates a environment variable BARISTA_URL
+
+# Set annotations for OpenShift Developer Console
+oc annotate deploy coffee-shop app.openshift.io/connects-to='["coffee-shop-database",{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"coffee-shop-database"},{"apiVersion":"apps/v1","kind":"Deployment","name":"barista"}]' -n ${OCP_USER}-dev-coffeeshop
+# This connects the three apps in OpenShift console
+
+# Create the route
+oc expose service coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+Add Health Checks to the applications
+# Set health checks for Barista application
+oc set probe deploy/barista --readiness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+oc set probe deploy/barista --liveness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+
+# Set health checks for Coffee Shop application
+oc set probe deploy/coffee-shop --readiness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+oc set probe deploy/coffee-shop --liveness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+
+Add resource requirements to the applications
+oc set resources deploy/barista --requests=cpu=100m,memory=256Mi
+oc set resources deploy/coffee-shop --requests=cpu=100m,memory=384Mi
+
+####################################################################################################
+Serverless & Advanced Builds
+
+Build and deploy the Barista application using Binary Builds
+oc delete deploy/barista \
+          buildconfig/barista \
+          service/barista \
+          imagestream/barista \
+          -n ${OCP_USER}-dev-coffeeshop
+
+oc delete secret gitea-secret -n ${OCP_USER}-dev-coffeeshop
+
+cd ${HOME}/coffee-shop-source/barista
+
+mvn clean compile package -DskipTests -s ${HOME}/coffee-shop-source/nexus_settings.xml
+
+Create a new OpenShift BuildConfig:
+
+oc new-build \
+   --name barista \
+   --binary \
+   --image-stream openshift/ubi8-openjdk-11:1.3 \
+   --labels app.kubernetes.io/name=barista,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+(Create OpenShift Build) Start the binary build and pass the fat jar file into the build.
+oc start-build barista \
+   --from-file=./target/barista-1.0-SNAPSHOT-runner.jar \
+   --follow \
+   -n ${OCP_USER}-dev-coffeeshop
+   
+# Create application from built container image
+oc new-app ${OCP_USER}-dev-coffeeshop/barista:latest \
+   --labels=app.kubernetes.io/part-of=coffee-shop,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+
+# Set health checks
+oc set probe deploy/barista --readiness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+oc set probe deploy/barista --liveness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop
+
+# Set resource requirements
+oc set resources deploy/barista --requests=cpu=100m,memory=256Mi -n ${OCP_USER}-dev-coffeeshop
+
+Build and deploy the Coffee Shop application using Binary Builds
+Retrieve the annotation from the Deployment that tells the OpenShift web console to which applications the coffee-shop application connects:
+oc get deploy coffee-shop -n ${OCP_USER}-dev-coffeeshop -o json | oc neat | jq ".metadata.annotations"
+
+oc delete deploy/coffee-shop \
+          buildconfig/coffee-shop \
+          service/coffee-shop \
+          route/coffee-shop \
+          imagestream/coffee-shop \
+          -n ${OCP_USER}-dev-coffeeshop
+		  
+cd ${HOME}/coffee-shop-source/coffee-shop
+
+mvn clean compile package -DskipTests -s ${HOME}/coffee-shop-source/nexus_settings.xml
+
+Create a new BuildConfig:
+oc new-build \
+   --name coffee-shop \
+   --binary \
+   --image-stream openshift/ubi8-openjdk-11:1.3 \
+   --labels app.kubernetes.io/name=coffee-shop,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+ 
+oc start-build coffee-shop \
+   --from-file=./target/coffee-shop-1.0-SNAPSHOT-runner.jar \
+   --follow \
+   -n ${OCP_USER}-dev-coffeeshop
+
+# Create application from built container image
+oc new-app ${OCP_USER}-dev-coffeeshop/coffee-shop:latest \
+   --labels=app.kubernetes.io/part-of=coffee-shop,app.openshift.io/runtime=quarkus \
+   -n ${OCP_USER}-dev-coffeeshop
+
+# Set health checks
+oc set probe deploy/coffee-shop --readiness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop -n ${OCP_USER}-dev-coffeeshop
+oc set probe deploy/coffee-shop --liveness --get-url=http://:8080/health -n ${OCP_USER}-dev-coffeeshop -n ${OCP_USER}-dev-coffeeshop
+
+# Set resource requirements
+oc set resources deploy/coffee-shop --requests=cpu=100m,memory=384Mi -n ${OCP_USER}-dev-coffeeshop
+
+# Set database connection information from secret
+oc set env deploy coffee-shop --from=secret/coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+# Set barista connection URL from config map
+oc set env deploy coffee-shop --from=configmap/coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+# Set annotations for OpenShift Developer Console
+oc annotate deploy coffee-shop app.openshift.io/connects-to='["coffee-shop-database",{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"coffee-shop-database"},{"apiVersion":"apps/v1","kind":"Deployment","name":"barista"}]' -n ${OCP_USER}-dev-coffeeshop
+
+# Create the route
+oc expose service coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+curl http://$(oc get route coffee-shop --template='{{ .spec.host }}' -n ${OCP_USER}-dev-coffeeshop)/health
+
+Update Barista application to Serverless
+oc delete deploy/barista \
+          service/barista \
+          -n ${OCP_USER}-dev-coffeeshop
+		  
+Deploy your barista container image as a serverless service.
+kn service create barista \
+   --image image-registry.openshift-image-registry.svc:5000/${OCP_USER}-dev-coffeeshop/barista:latest \
+   --label app.openshift.io/runtime=quarkus \
+   --label app.kubernetes.io/part-of=coffee-shop \
+   --port 8080 \
+   --cluster-local \
+   --request cpu=100m,memory=256Mi \
+   -n ${OCP_USER}-dev-coffeeshop
+
+Retrieve the generated URL:
+kn route list -n ${OCP_USER}-dev-coffeeshop
+
+Update the config map coffee-shop with the new connection information.
+oc delete configmap coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+oc create configmap coffee-shop --from-literal=BARISTA_URL=http://barista.${OCP_USER}-dev-coffeeshop.svc.cluster.local/processes -n ${OCP_USER}-dev-coffeeshop
+
+Redeploy the coffee-shop application to have it pick up the updated BARISTA_URL environment variable.
+oc delete pod -l deployment=coffee-shop -n ${OCP_USER}-dev-coffeeshop
+
+Change the annotation for the coffee-shop application to point to the KNative service instead of the Deployment for the barista service. 
+# Set annotations for OpenShift Developer Console
+oc annotate deploy coffee-shop app.openshift.io/connects-to='["coffee-shop-database",{"apiVersion":"apps/v1","kind":"Deployment","name":"coffee-shop-database"},{"apiVersion":"serving.knative.dev/v1","kind":"Service","name":"barista"},{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"coffee-shop-database"}]' --overwrite -n ${OCP_USER}-dev-coffeeshop

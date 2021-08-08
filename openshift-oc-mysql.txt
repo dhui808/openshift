@@ -1,0 +1,11 @@
+1. Check mysql connectivity from the client pod
+	oc rsh quotesapi-1-d5rss bash -c 'echo > /dev/tcp/$DATABASE_SERVICE_NAME/3306 && echo OK || echo FAIL'
+	where quotesapi-1-d5rss is the client pod name. DATABASE_SERVICE_NAME is the env variable in client pod
+
+2. Check if mysql is running in the mysql server pod
+	oc rsh quotesdb-1-7zrzr bash -c "mysql -uuser1 -pmypa55 -Dphpapp -e 'select 1'"
+	or
+	oc rsh quotesdb-1-7zrzr bash -c "mysql -uroot"
+	in the 2nd cmd, mysql> prompt is displayed
+
+	
