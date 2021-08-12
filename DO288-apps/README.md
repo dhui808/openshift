@@ -343,26 +343,26 @@ scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbm
     
 ## Creating Applications from OpenShift Templates (Chapter 6)
 ###     Creating a Multicontainer Template
-Manually Creating Resource Files
-	use the oc explain and oc api-resources commands to view the attributes for each resource type
-Concatenating Resource Files				oc new-app -o json/yaml can create a resource definition file, instead of creating resources
-Exporting Existing Resources
-	oc get -o json/yaml
-	oc get -o yaml is,bc,dc,svc,route > mytemplate.yaml
-Describing OpenShift Resource Types
-	oc explain command lists the top-level attributes for that resource type:
-	oc explain routes
-	oc explain routes.spec
-Creating an Application from a Template
-	oc new-app command creates resources from the template, 
-	oc process command creates a resource list from the template
-	oc new-app --file mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2
-	oc process -f mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2 > myresourcelist.yaml
-	oc process -f mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2 | oc create -f -
-Listing parameters
-	oc process --parameters -f mytemplate.yaml
+	Manually Creating Resource Files
+		use the oc explain and oc api-resources commands to view the attributes for each resource type
+	Concatenating Resource Files				oc new-app -o json/yaml can create a resource definition file, instead of creating resources
+	Exporting Existing Resources
+		oc get -o json/yaml
+		oc get -o yaml is,bc,dc,svc,route > mytemplate.yaml
+	Describing OpenShift Resource Types
+		oc explain command lists the top-level attributes for that resource type:
+		oc explain routes
+		oc explain routes.spec
+	Creating an Application from a Template
+		oc new-app command creates resources from the template, 
+		oc process command creates a resource list from the template
+		oc new-app --file mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2
+		oc process -f mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2 > myresourcelist.yaml
+		oc process -f mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2 | oc create -f -
+	Listing parameters
+		oc process --parameters -f mytemplate.yaml
 
-Lab
+	Lab
 	~research\github\do288-apps-quotes
 	oc create -f quotes.yaml
 	template.template.openshift.io/quotes created
