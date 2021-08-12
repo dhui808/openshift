@@ -289,7 +289,11 @@ scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbm
 	Tag the image:
 	docker tag s2i-do288-nginx quay.io/xyz/s2i-do288-nginx
 	docker push quay.io/xyz/s2i-do288-nginx
-		
+	
+	The s2i build command requires the use of a local Docker service.
+	To provide support for environments that do not have Docker available, the s2i build command now includes the --as-dockerfile path/to/Dockerfile 
+	option. By using this option, no local Docker daemon is required to run the s2i build command
+
 ###     Create an OpenShift image stream for the Nginx S2I builder image:
 	oc import-image s2i-do288-nginx --from quay.io/xyz/s2i-do288-nginx --confirm
 	Create applications using the Nginx S2I builder image:
