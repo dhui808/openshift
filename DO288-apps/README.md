@@ -27,7 +27,7 @@ oc cp dannyhui-dev/springbootstarter-w-config-3-fqvwq:/opt/springbootstarter-w-c
 scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbmqk.example.opentlc.com:/home/lab-user/coffee-shop-final-lab/coffee-shop-pipeline  
 oc rsh frontend-1-zvjhb
 
-### Common oc commands
+Common oc commands
 oc new-app --as-deployment-config --name echo https://github.com/dhui808/openshift --context-dir DO288-apps/ubi-echo
 	oc expose dc/echo --port=8080
 	oc expose svc/echo
