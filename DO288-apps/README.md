@@ -2,15 +2,14 @@
 
 This repository is forked from https://github.com/RedHatTraining/DO288-apps and modified to complete DO288 exercises and labs.
 
-Applications Deployment\
-Maintenance\
-Troubleshooting\
-Customizing Dockerfiles and S2I Builder Images\
-Using OpenShift ConfigMaps and Secrets\
-Implementing Hooks and Triggers\
-Working with Templates\
+Applications Deployment  
+Maintenance  
+Troubleshooting  
+Customizing Dockerfiles and S2I Builder Images  
+Using OpenShift ConfigMaps and Secrets  
+Implementing Hooks and Triggers  
+Working with Templates  
 Application Health Monitoring
-
 
 Container Images (Builder Images) from Redhat Registry
 
@@ -28,6 +27,79 @@ oc cp dannyhui-dev/springbootstarter-w-config-3-fqvwq:/opt/springbootstarter-w-c
 scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbmqk.example.opentlc.com:/home/lab-user/coffee-shop-final-lab/coffee-shop-pipeline  
 oc rsh frontend-1-zvjhb
 
+### Common oc commands
+oc new-app --as-deployment-config --name echo https://github.com/dhui808/openshift --context-dir DO288-apps/ubi-echo
+	oc expose dc/echo --port=8080
+	oc expose svc/echo
+	oc get pod
+	oc logs -f echo-1-nfmpt
+oc create -f php-mysql-ephemeral.json
+	oc new-app --as-deployment-config --template php-mysql-ephemeral -p NAME=quotesapi -p SOURCE_REPOSITORY_URL=https://github.com/dhui808/openshift -p CONTEXT_DIR=DO288-apps/quotes -p DATABASE_SERVICE_NAME=quotesdb -p DATABASE_USER=user1 -p DATABASE_PASSWORD=mypa55 --name quotes
+oc rsh quotesapi-1-d5rss bash -c 'echo > /dev/tcp/$DATABASE_SERVICE_NAME/3306 && echo OK || echo FAIL'
+	oc rsh quotesdb-1-7zrzr bash -c "mysql -uuser1 -pmypa55 phpapp -e 'select 1'"
+py -m json.tool package.json
+To allow containers to run as the root user:
+	oc create serviceaccount myserviceaccount
+	oc explain deploymentconfig.spec.template.spec
+	oc patch dc/demo-app --patch '{"spec":{"template":{"spec":{"serviceAccountName": "myserviceaccount"}}}}'
+	oc adm policy add-scc-to-user anyuid -z myserviceaccount
+
+Dockerfile
+	FROM quay.io/redhattraining/httpd-parent
+	EXPOSE 8080
+	LABEL io.k8s.description="A basic Apache HTTP Server child image, uses ONBUILD" \
+		io.k8s.display-name="My Apache HTTP Server" \
+		io.openshift.expose-services="8080:http" \
+		io.openshift.tags="apache, httpd"
+	RUN sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf
+	RUN chgrp -R 0 /var/log/httpd /var/run/httpd && \
+	chmod -R g=u /var/log/httpd /var/run/httpd
+	USER 1001
+	
+oc create configmap myappconf --from-literal APP_MSG="Test Message"
+	oc create secret generic myappfilesec --from-file C:\opt\openshift\DO28-apps\app-config\myapp.sec
+	oc get secret/myappfilesec -o json
+	oc set env dc/myapp --from cm/myappconf
+	oc set volume dc/myapp --add -t secret -m /opt/app-root/secure --name myappsec-vol --secret-name myappfilesec
+oc set triggers dc/mydcname --from-config --remove
+oc set triggers dc/mydcname --from-config
+
+oc set probe dc/probes --liveness --get-url=http://:8080/healthz --initial-delay-seconds=2 --timeout-seconds=2
+oc rollout latest dc/quip
+oc set triggers dc/name --from-image=myproject/origin-ruby-sample:latest -c helloworld
+oc scale dc/name --replicas=3
+oc create -f quotes.yaml
+oc get templates quotes
+	
+oc policy add-role-to-user system:image-puller user_name -n project_name
+Allowing pods to reference images across projects
+	Switch another project dannyhui-stage
+	oc project dannyhui-stage
+	Grant service accounts from the dannyhui-stage project access to image streams from the dannyhui-dev project
+	(RoleBindings entry is created in dannyhui-dev)
+	oc policy add-role-to-group -n dannyhui-dev system:image-puller system:serviceaccounts:dannyhui-stage
+	Deploy the application using the image stream from dannyhui-dev:
+	oc new-app --as-deployment-config --name phpinfo -i dannyhui-dev/php-hello-dockerfile
+	curl http://phpinfo-dannyhui-stage.apps.sandbox.x8i5.p1.openshiftapps.com
+oc set build-hook bc/myhook --post-commit --command -- bash -c "curl -s -S -i -X POST http://builds-for-managers-dannyhui-dev.apps.sandbox.x8i5.p1.openshiftapps.com/api/builds -f -d 'developer=dannyhui&git=https://github.com/dhui808/openshift&project=dannyhui-dev'"
+	oc start-build bc/myhook -F
+	oc set build-hook bc/name --post-commit --script="curl http://api.com/user/${USER}"
+	
+podman run -d -p 8080:8080 nginx-test
+s2i create s2i-do288-go s2i-do288-go
+	podman build --format docker -t s2i-sample-app .
+	s2i build .\go-hello  s2i-do288-go go-hello-dockerfile --as-dockerfile .\go-dockerfile\Dockerfile
+oc create secret docker-registry quayio   --docker-server=quay.io --docker-username=<your quay id>   --docker-password=<quay pwd>  --docker-email=<your email>
+	oc secrets link default registrycreds --for pull
+	oc secrets link builder quayio
+	oc import-image s2i-do288-go --from quay.io/xyz/s2i-do288-go --confirm
+	
+oc rsh quotesdb-1-fk2vx
+	vi /tmp/quotes.sql
+	(copy & paste from local quotes.sql)
+	mysql -uquoteapp -pmypa55word quotesdb < /tmp/quotes.sql
+	exit
+	
 ## Deploying and Managing Applications on an OpenShift Cluster (Chapter 1)
 ###     Managing Applications with the CLI
 	~research\github\openshift\DO288-apps\ubi-echo
@@ -100,7 +172,7 @@ oc rsh frontend-1-zvjhb
 	oc get cm/properties
 		NAME         DATA   AGE
 		properties   1      22s
-	oc get cm/properties -o jsin
+	oc get cm/properties -o json
 	oc describe cm/properties
 		
 ###     Designing Containerized Applications for OpenShift
@@ -426,7 +498,8 @@ oc rsh frontend-1-zvjhb
 	To cancel a deployment: oc rollout cancel dc/name
 	To retry a failed deployment: oc rollout retry dc/name
 	oc rollback dc/name
-	To prevent accidentally starting a new deployment process after a rollback is complete: oc set triggers dc/mydcname --from-config --remove
+	To prevent accidentally starting a new deployment process after a rollback is complete: 
+	dc/mydcname --from-config --remove
 	After a rollback, you can re-enable image change triggers: oc set triggers dc/mydcname --auto
 	oc scale dc/name --replicas=3
 	To set the ImageChange trigger:
