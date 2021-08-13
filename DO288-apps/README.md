@@ -54,6 +54,8 @@ scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbm
 
 ## Designing Containerized Applications for OpenShift (Chapter 2)
 ###     Building Container Images with Advanced Dockerfile Instructions
+	Use the --format docker option in order to enable support for the ONBUILD instruction in Dockerfile
+	
 	To allow containers to run as the root user:
 		oc create serviceaccount myserviceaccount
 		oc explain deploymentconfig.spec.template.spec
