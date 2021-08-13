@@ -22,9 +22,11 @@ registry.access.redhat.com/rhscl/ror-50-rhel7 \
 registry.access.redhat.com/rhscl/mysql-80-rhel7\
 registry.access.redhat.com/ubi8/nginx-118
 
-How to use ssh and scp:
-ssh lab-user@studentvm.4qxbn.example.opentlc.com\
+How to use ssh cp, and scp:
+ssh lab-user@studentvm.4qxbn.example.opentlc.com
+oc cp dannyhui-dev/springbootstarter-w-config-3-fqvwq:/opt/springbootstarter-w-config-logs/app.log  logs/app.log
 scp -r pipeline-build-and-deploy-quarkus-application.yaml lab-user@studentvm.wbmqk.example.opentlc.com:/home/lab-user/coffee-shop-final-lab/coffee-shop-pipeline
+oc rsh frontend-1-zvjhb
 
 ## Deploying and Managing Applications on an OpenShift Cluster (Chapter 1)
 ###     Managing Applications with the CLI
