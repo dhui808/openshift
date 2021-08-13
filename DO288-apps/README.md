@@ -349,7 +349,7 @@ oc rsh frontend-1-zvjhb
 ###     Creating a Multicontainer Template
 	Manually Creating Resource Files
 		use the oc explain and oc api-resources commands to view the attributes for each resource type
-	Concatenating Resource Files				oc new-app -o json/yaml can create a resource definition file, instead of creating resources
+	Concatenating Resource Files oc new-app -o json/yaml can create a resource definition file, instead of creating resources
 	Exporting Existing Resources
 		oc get -o json/yaml
 		oc get -o yaml is,bc,dc,svc,route > mytemplate.yaml
