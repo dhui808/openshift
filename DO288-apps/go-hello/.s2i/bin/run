@@ -1,0 +1,2 @@
+echo "Starting app with lang option 'en'..."
+exec /opt/app-root/gobinary --lang en
