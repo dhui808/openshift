@@ -29,6 +29,9 @@ RUN sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf
 # io.openshift.s2i.scripts-url LABEL (default is /usr/libexec/s2i)
 COPY ./s2i/bin/ /usr/libexec/s2i
 
+# Have to add this to avoid permission denied error
+RUN chmod -R g=u /usr/libexec/s2i
+
 ENV APP_DIRS /var/www/ /run/httpd/ /etc/httpd/logs/ /var/log/httpd/
 
 RUN chown -R 1001:1001 $APP_DIRS && \
