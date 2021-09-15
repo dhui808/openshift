@@ -189,7 +189,7 @@ objects:
         - quotesdb
         from:
           kind: ImageStreamTag
-          name: mysql:5.7
+          name: mysql:latest
           namespace: openshift
       type: ImageChange
 - apiVersion: v1
