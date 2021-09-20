@@ -1,7 +1,7 @@
 FROM s2i-do288-httpd
-LABEL "io.openshift.s2i.build.image"="s2i-do288-httpd" \
-      "io.openshift.s2i.build.source-location"="test/test-app" \
-      "io.k8s.display-name"="httpd-test"
+LABEL "io.openshift.s2i.build.source-location"="test/test-app" \
+      "io.k8s.display-name"="httpd-test" \
+      "io.openshift.s2i.build.image"="s2i-do288-httpd"
 
 USER root
 # Copying in source code

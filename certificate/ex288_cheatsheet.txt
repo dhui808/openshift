@@ -1,0 +1,127 @@
+ssh lab-user@studentvm.wtnlk.example.opentlc.com
+password: MRXYdI3maBem
+
+How to use ssh, cp and docker cp: 
+ssh lab-user@studentvm.4qxbn.example.opentlc.com
+docker cp Dockerfile 18d3a906af76:/tmp/Dockerfile
+oc cp dannyhui-dev/springbootstarter-w-config-3-fqvwq:/opt/springbootstarter-w-config-logs/app.log  logs/app.log
+oc rsh frontend-1-zvjhb
+
+podman login -u quay_user_id quay.io
+podman search s2i-do288-httpd
+
+Allowing pods to reference images across projects
+	/opt/openshift/DO288-apps/php-hello-dockerfile
+	podman build -t php-hello-dockerfile .
+	podman run -it -d -p 8080:8080 php-hello-dockerfile
+	curl localhost:8080
+	podman push php-hello-dockerfile quay.io/${quay_user_id}/php-hello-dockerfile
+	
+	dannyhui.dev
+	oc import-image php-hello-dockerfile --confirm --reference-policy local --from quay.io/${quay_user_id}/php-hello-dockerfile
+	
+	Switch another project dannyhui-stage
+	oc project dannyhui-stage
+	Grant service accounts from the dannyhui-stage project access to image streams from the dannyhui-dev project
+	(RoleBindings entry is created in dannyhui-dev)
+	oc policy add-role-to-group -n dannyhui-dev system:image-puller system:serviceaccounts:dannyhui-stage
+	Deploy the application using the image stream from dannyhui-dev:
+	oc new-app --as-deployment-config --name phpinfo -i dannyhui-dev/php-hello-dockerfile
+	curl phpinfo-dannyhui-stage.apps.sandbox-m2.ll9k.p1.openshiftapps.com
+	
+Import image from external registry
+	oc create secret docker-registry quayio    --docker-server=quay.io    --docker-username=${quay_user_id}    --docker-password=quay_pwd
+	or
+	oc create secret generic quayio --from-file=.dockerconfigjson=/run/containers/0/auth.json  --type=kubernetes.io/dockerconfigjson
+	
+	oc secrets link default quayio --for=pull
+	oc secrets link builder quayio 
+	oc import-image s2i-do288-httpd --from quay.io/${quay_user_id}/s2i-do288-httpd --confirm --reference-policy local
+	oc new-app --as-deployment-config s2i-do288-httpd~https://github.com/${quay_user_id}/openshift.git --context-dir DO288-apps/html-helloworld --name hellohttpd --strategy=source
+	curl hellohttpd-dannyhui-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com
+
+Customizing Dockerfiles and S2I Builder Images
+	Creating a httpd s2i builder image
+	s2i create s2i-do288-httpd s2i-do288-httpd
+	cd /opt/openshift/DO288-apps/s2i-do288-httpd
+	podman build -t s2i-do288-httpd .
+	s2i build test/test-app s2i-do288-httpd httpd-test --as-dockerfile test/Dockerfile
+	podman build -t httpd-test test
+	podman run -d -p 8080:8080 httpd-test
+	curl localhost:8080
+
+Using OpenShift ConfigMaps and Secrets
+	oc new-app --as-deployment-config --name myapp nodejs~https://github.com/dhui808/openshift --context-dir DO288-apps/app-config
+	oc create configmap myappconf --from-literal APP_MSG="Test Message"
+	oc describe cm/myappconf
+	oc create secret generic myappfilesec --from-file /opt/openshift/DO288-apps/app-config/myapp.sec
+	oc get secret/myappfilesec -o json
+	oc set env dc/myapp --from cm/myappconf
+	oc set volume dc/myapp --add -t secret -m /opt/app-root/secure --name myappsec-vol --secret-name myappfilesec
+	oc set volume dc/mydcname --add -t configmap -m /path/to/mount/volume --name myvol --configmap-name myconf
+	
+Implementing Hooks and Triggers
+	oc new-app --as-deployment-config --name myhook php:7.3~https://github.com/dhui808/openshift --context-dir DO288-apps/post-commit-python
+	oc set build-hook bc/myhook --post-commit --command -- bash -c "python helloworld.py"
+	oc start-build bc/myhook -F
+	oc describe bc/myhook
+	oc set build-hook bc/myhook --post-commit --remove
+
+	oc set build-hook bc/myhook --post-commit --script 'python helloworld.py'
+	oc start-build bc/myhook -F
+	oc logs -f bc/myhook
+	oc get bc/myhook -o yaml
+	  postCommit:
+		script: python helloworld.py
+	oc set build-hook bc/myhook --post-commit --remove
+
+
+Exposing the registry (https://docs.openshift.com/container-platform/4.6/registry/securing-exposing-registry.html)
+	oc patch configs.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
+	HOST=$(oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}')
+	podman login -u kubeadmin -p $(oc whoami -t) --tls-verify=false $HOST 
+	or
+	podman login -u ${oc whoami} -p $(oc whoami -t) --tls-verify=false $HOST 
+	oc get route -n openshift-image-registry
+	podman pull ${HOST}/myproj/myapp
+	skopeo inspect --tls-verify=false docker://default-route-openshift-image-registry.domain.example.com/myproj/myapp
+	
+Working with Templates
+	oc new-app --file mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2v
+	oc process -f mytemplate.yaml -p PARAM1=value1 -p PARAM2=value2 > myresourcelist.yaml 
+	oc create -f myresourcelist.yaml
+	
+	~research\github\openshift\DO288-apps\chapter6-create-template
+	oc new-app --as-deployment-config --file quotes-template.yaml -p APP_GIT_URL=https://github.com/dhui808/do288-apps-quotes -p SECRET=my5ecret -p PASSWORD=mypa55word --name quotes
+	curl quotesapi-dannyhui-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com
+	oc get pod -l deploymentconfig=quotesdb -o name
+	oc cp quotes.sql quotesdb-1-kh2xk:/tmp/quotes.sql
+	oc rsh quotesdb-1-kh2xk
+	mysql -uquoteapp -pmypa55word quotesdb < /tmp/quotes.sql
+	exit
+	curl quotesapi-dannyhui-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/get.php
+
+	~research\github\openshift\DO288-apps\chapter6-template
+	oc process --parameters -f todo-template.yaml
+	oc new-app --file todo-template.yaml -p NPM_PROXY=https://registry.access.redhat.com/rhscl/nodejs-4-rhel7 -p PASSWORD=mypass -p CLEAN_DATABASE=true -p APP_GIT_URL=https://github.com/dhui808/do288-apps-todo-single -p HOSTNAME=todoapp-dannyhui-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com
+	curl todoapp-dannyhui-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com/todo
+	
+Application Health Monitoring
+	oc new-app --as-deployment-config --name probes nodejs~https://github.com/dhui808/openshift --context-dir DO288-apps/probes
+	oc set probe dc/probes --liveness --initial-delay-seconds=10 --timeout-seconds=30 --open-tcp=8080 
+	oc get dc/probes -o yaml
+		livenessProbe:
+		  failureThreshold: 3
+		  initialDelaySeconds: 10
+		  periodSeconds: 10
+		  successThreshold: 1
+		  tcpSocket:
+			port: 8080
+		  timeoutSeconds: 30
+	oc describe dc/probes
+		Liveness:   tcp-socket :8080 delay=10s timeout=30s period=10s #success=1 #failure=3
+	
+	oc set probe dc/probes --readiness --initial-delay-seconds=30 --timeout-seconds=2 --get-url=http://:8080/ready 
+	oc set probe dc/probes --liveness --remove
+	oc set probe dc/myapp --liveness -- echo ok
+	
